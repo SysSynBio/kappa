@@ -18,7 +18,7 @@ let error x i =
   unsafe_frozen (Some x) (Some "Complx") (Some "Ode_print.ml") None (Some ("line  "^(string_of_int i))) (fun () -> raise Exit)
 
 
-let all_fields x  = [x.dump;x.matlab;x.mathematica;x.latex;x.matlab_aux;x.data;x.kappa;x.txt;x.matlab_jacobian;x.matlab_size;x.matlab_activity;x.matlab_obs;x.matlab_init]
+let all_fields x  = [x.dump;x.matlab;x.mathematica;x.latex;x.matlab_aux;x.data;x.kappa;x.txt;x.matlab_jacobian;x.matlab_size;x.matlab_activity;x.matlab_obs;x.matlab_init;x.reactions]
 
       
 module CSet = Set.Make (struct type t = out_channel let compare = compare end)
@@ -45,7 +45,8 @@ let print_none =
      matlab_jacobian= None;
      matlab_activity = None;
      matlab_obs = None;
-     matlab_init = None } 
+     matlab_init = None;
+     reactions = None} 
 
 let print_intermediar_var print var rule  =
   let _ = 
@@ -1082,6 +1083,60 @@ let pprint_ODE_head print print_obs print_activity print_perturb file_main file 
 	None -> ()
       |	Some print -> 
 	  print.print_string  ("Y("^(string_of_int n)^"):=");
+     in 
+     let _ = 
+       match print.kappa  with 
+	 None -> ()
+       |	Some print -> 
+	   print.print_string "%obs:";
+     in 
+     let _ = 
+       match print.data with 
+	 None -> ()
+       | Some print -> 
+	   print.print_string "[";
+     in 
+     let _ = print_sb expr in 
+     let _ = 
+       match print.dump with 
+	 None -> ()
+       |	Some print -> print.print_newline ()
+     in 
+     let _ = 
+       match print.txt with 
+	 None -> ()
+       |	Some print -> 
+	   print.print_newline () 
+     in 
+     let _ = 
+       match print.kappa  with 
+	 None -> ()
+       |	Some print -> 
+	   print.print_newline () 
+     in 
+     let _ = 
+       match print.data with 
+	 None -> ()
+       | Some print -> 
+	   begin 
+	     print.print_string "]";
+	     print.print_string " " 
+	   end
+     in 
+     ( ) 
+
+ let pprint_obs_in_reaction print print_sb n expr pb = 
+    let _ = 
+      match print.dump with 
+	None -> ()
+      |	Some print -> 
+	  print.print_string  ((string_of_int n)^" := ");
+    in 
+     let _ = 
+      match print.txt with 
+	None -> ()
+      |	Some print -> 
+	  print.print_string  ((string_of_int n)^" := ");
      in 
      let _ = 
        match print.kappa  with 
